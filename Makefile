@@ -27,7 +27,7 @@ obj/ obj/include:
 
 build-iso: aijak.iso
 
-aijal.iso: $(KERNEL_NAME)
+aijak.iso: $(KERNEL_NAME)
 	grub2-mkrescue -o aijak.iso iso
 
 clean:
