@@ -31,7 +31,7 @@ aijak.iso: $(KERNEL_NAME)
 	grub2-mkrescue -o aijak.iso iso
 
 clean:
-	@-rm -r obj/ $(KERNEL_NAME)
+	@-rm -r obj/ $(KERNEL_NAME) aijak.iso
 
 test:
 	qemu-system-x86_64 -kernel $(KERNEL_NAME)
