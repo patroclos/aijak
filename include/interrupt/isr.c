@@ -3,6 +3,8 @@
 #include "screen.h"
 #include "util.h"
 
+#include "irq.h"
+
 void isr_install()
 {
     set_idt_gate(0, (uint32)isr0);
@@ -37,6 +39,8 @@ void isr_install()
     set_idt_gate(29, (uint32)isr29);
     set_idt_gate(30, (uint32)isr30);
     set_idt_gate(31, (uint32)isr31);
+
+    irq_install();
 
     set_idt();
 }
@@ -238,23 +242,23 @@ void isr31()
 //Messages
 string exception_messages[] =
 {
-    "Division by Zero",
-    "Debug",
-    "Non Maskable Interrupt",
-    "Breakpoint",
-    "Overflow",
-    "Bounds",
-    "Invalid Optcode",
-    "Coprocessor not available",
-    "Double fault",
-    "Coprocessor Segment Overrun",
-    "Invalid Task State Segment",
-    "Segment not present",
-    "Stack Fault",
-    "General protection fault",
-    "Page fault",
-    "reserved",
-    "Math Fault",
-    "Alignment Check",
-    "Machine Check"
+    "EXC0 Division by Zero",
+    "EXC1 Debug",
+    "EXC2 Non Maskable Interrupt",
+    "EXC3 Breakpoint",
+    "Ex4 Overflow",
+    "EXC5 Bounds",
+    "EXC6 Invalid Optcode",
+    "EXC7 Coprocessor not available",
+    "EXC8 Double fault",
+    "EXC9 Coprocessor Segment Overrun",
+    "EXC0A Invalid Task State Segment",
+    "EXC0B Segment not present",
+    "EXC0C Stack Fault",
+    "EXC0D General protection fault",
+    "EXC0E Page fault",
+    "EXC0F reserved",
+    "EXC10 Math Fault",
+    "EXC11 Alignment Check",
+    "EX12 Machine Check"
 };

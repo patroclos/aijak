@@ -1,7 +1,7 @@
 CC=gcc
-CFLAGS=-m32 -c -Wall -ffreestanding -O0
+CFLAGS=-m32 -c -Wall -ffreestanding -O0 -Iinclude/
 
-CMODULES=system string screen keyboard util idt isr
+CMODULES=system string screen keyboard util interrupt/idt interrupt/isr
 MODULES=kernelasm kernel
 MODULEOBJS=$(addprefix obj/,$(addsuffix .o,$(MODULES)))
 KERNEL_NAME=iso/boot/kernel.bin
@@ -19,10 +19,10 @@ obj/kernelasm.o: kernel.asm | obj/
 obj/kernel.o: kernel.c | obj/
 	$(CC) $(CFLAGS) kernel.c -o obj/kernel.o
 
-obj/include/%.o: include/%.c include/%.h | obj/ obj/include
+obj/include/%.o: include/%.c include/%.h | obj/ obj/include obj/include/interrupt
 	$(CC) $(CFLAGS) $< -o $@
 
-obj/ obj/include:
+obj/ obj/include obj/include/interrupt:
 	@mkdir $@
 
 build-iso: aijak.iso
