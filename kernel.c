@@ -1,8 +1,9 @@
-#include "screen.h"
-#include "keyboard.h"
-#include "string.h"
-#include "util.h"
-#include "interrupt/isr.h"
+#include <system.h>
+#include <screen.h>
+#include <keyboard.h>
+#include <string.h>
+#include <util.h>
+#include <interrupt/isr.h>
 
 void dmpnum(int i)
 {
@@ -16,13 +17,10 @@ void kmain()
     clearScreen();
     isr_install();
 
-    //print("Welcome to AIJAK (AIJAK is just another kernel)\n");
+    print("Welcome to AIJAK (AIJAK is just another kernel)\n");
 
     for(;;)
     {
-        __asm__ ("hlt");
+        asm ("hlt");
     }
-
-    print("Exiting");
-
 }

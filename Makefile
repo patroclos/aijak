@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-m32 -c -Wall -ffreestanding -O0 -Iinclude/
 
-CMODULES=system string screen keyboard util interrupt/idt interrupt/isr
+CMODULES=system string screen keyboard util interrupt/idt interrupt/isr interrupt/irq
 MODULES=kernelasm kernel
 MODULEOBJS=$(addprefix obj/,$(addsuffix .o,$(MODULES)))
 KERNEL_NAME=iso/boot/kernel.bin
