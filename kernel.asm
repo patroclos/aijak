@@ -48,20 +48,9 @@ irq_common_stub:
         jmp irq_common_stub
 %endmacro
 
-;IRQs
-IRQ_ENTRY 0, 32
-IRQ_ENTRY 1, 33
-IRQ_ENTRY 2, 34
-IRQ_ENTRY 3, 35
-IRQ_ENTRY 4, 36
-IRQ_ENTRY 5, 37
-IRQ_ENTRY 6, 38
-IRQ_ENTRY 7, 39
-IRQ_ENTRY 8, 40
-IRQ_ENTRY 9, 41
-IRQ_ENTRY 10, 42
-IRQ_ENTRY 11, 43
-IRQ_ENTRY 12, 44
-IRQ_ENTRY 13, 45
-IRQ_ENTRY 14, 46
-IRQ_ENTRY 15, 47
+;Loop 16 times and define each IRQ callback
+%assign irqnum 0
+%rep 16
+    IRQ_ENTRY irqnum, irqnum+32
+    %assign irqnum irqnum+1
+%endrep
