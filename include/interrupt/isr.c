@@ -40,8 +40,6 @@ void isr_install()
     set_idt_gate(30, (uint32)isr30);
     set_idt_gate(31, (uint32)isr31);
 
-    irq_install();
-
     set_idt();
 }
 

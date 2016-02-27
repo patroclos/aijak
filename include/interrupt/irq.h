@@ -14,6 +14,10 @@
 #define IRQ_OFF { asm volatile ("cli"); }
 #define IRQ_RES { asm volatile ("sti"); }
 
+uint32 irq_routines[16];
+
+void irq_setroutine(uint8 irq, uint32 routine);
+void irq_clearroutine(uint8 irq);
 
 void _irq0();
 void _irq1();

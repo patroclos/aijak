@@ -2,6 +2,19 @@
 #include "screen.h"
 #include "util.h"
 
+
+uint32 irq_routines[16] = { NULL };
+
+void irq_setroutine(uint8 irq, uint32 routine)
+{
+    irq_routines[irq] = routine;
+}
+
+void irq_clearroutine(uint8 irq)
+{
+    irq_routines[irq] = NULL;
+}
+
 void irq_remap()
 {
     //save masks
@@ -54,14 +67,10 @@ void irq_gates()
 void irq_install()
 {
     irq_remap();
-
-    //unmask keyboard irq only
-    //outportb(0x21, 0xfc);
-    //outportb(0xa1, 0xff);
-    mask_irqs(0x0);
-    asm("sti");
-
     irq_gates();
+    mask_irqs(0x0);
+    io_wait();
+    IRQ_RES;
 }
 
 void mask_irqs(uint16 mask)
@@ -79,33 +88,29 @@ void send_eoi(uint8 irq_num)
     outportb(PIC_MASTER_COMMAND, EOI);
 }
 
-uint8 kbhandle(struct regs *r)
-{
-    while(inportb(0x64) & 2);
-    return inportb(0x60);
-}
-
 void irq_handler(struct regs *r)
 {
     IRQ_OFF;
     int inum = r->int_no - 32;
-    if(inum==1)
+
+    void (*handler)(struct regs *r);
+    if(inum<0 || inum>16)
     {
-        uint8 sc = kbhandle(r);
-        string str[4];
-        int_to_ascii(sc, str);
-        print("Scancode: ");
-        print(str);
-        print("\n");
+        handler = NULL;
+    }
+    else
+    {
+        handler = irq_routines[inum];
     }
 
-    #if 0
-    print("I");
-    string inums = " ";
-    int_to_ascii(inum, inums);
-    print(inums);
-    #endif
+    if(handler==NULL)
+    {
+        send_eoi(inum);
+    }
+    else
+    {
+        handler(r);
+    }
 
-    send_eoi(inum);
     IRQ_RES;
 }
