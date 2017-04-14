@@ -1,0 +1,5 @@
+-Iinclude
+-ffreestanding
+-fno-builtin
+-nostdlib
+-nostdinc

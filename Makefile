@@ -1,37 +1,47 @@
 CC=gcc
-CFLAGS=-m32 -c -Wall -ffreestanding -O0 -Iinclude/
+ASMC=nasm
+OPTIMIZATION=0
+CFLAGS=-m32 -Wall -ffreestanding -fno-builtin -nostdlib -nostdinc -Iinclude -O$(OPTIMIZATION) -g
 
-CMODULES=system string screen keyboard util interrupt/idt interrupt/isr interrupt/irq
-MODULES=kernelasm kernel
-MODULEOBJS=$(addprefix obj/,$(addsuffix .o,$(MODULES)))
-KERNEL_NAME=iso/boot/kernel.bin
+QEMUCMD=qemu-system-x86_64 -kernel $(BINARY) -hda hda.img
 
-OBJS=$(addprefix obj/include/,$(addsuffix .o,$(CMODULES)))
 
-$(KERNEL_NAME): $(OBJS) $(MODULEOBJS)
-	ld -m elf_i386 -T link.ld -o $(KERNEL_NAME) $(MODULEOBJS) $(OBJS)
+SRC_DIR=src
+INC_DIR=include
+OBJ_DIR=build
+BIN_DIR=bin
 
-all: $(KERNEL_NAME) build-iso
+SOURCES_C := $(shell find $(SRC_DIR) -name '*.c')
+SOURCES_ASM := $(shell find $(SRC_DIR) -name '*.asm')
 
-obj/kernelasm.o: kernel.asm | obj/
-	nasm -f elf32 kernel.asm -o $(addprefix obj/,kernelasm.o)
+OBJECTS_C := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.co,$(SOURCES_C))
+OBJECTS_ASM := $(patsubst $(SRC_DIR)/%.asm,$(OBJ_DIR)/%.ao,$(SOURCES_ASM))
 
-obj/kernel.o: kernel.c | obj/
-	$(CC) $(CFLAGS) kernel.c -o obj/kernel.o
+KERNEL_NAME=AIJAK
+BINARY=$(BIN_DIR)/$(KERNEL_NAME)
 
-obj/include/%.o: include/%.c include/%.h | obj/ obj/include obj/include/interrupt
-	$(CC) $(CFLAGS) $< -o $@
+.PHONY: clean test debug debugger
 
-obj/ obj/include obj/include/interrupt:
-	@mkdir $@
+$(BINARY): $(OBJECTS_C) $(OBJECTS_ASM)
+	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@) ; fi
+	ld -m elf_i386 -T link.ld -o $(BINARY) $(OBJECTS_ASM) $(OBJECTS_C)
 
-build-iso: aijak.iso
+$(OBJ_DIR)/%.ao: $(SRC_DIR)/%.asm
+	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@) ; fi
+	$(ASMC) -f elf32 $< -o $@
 
-aijak.iso: $(KERNEL_NAME)
-	grub2-mkrescue -o aijak.iso iso
+$(OBJ_DIR)/%.co: $(SRC_DIR)/%.c $(wildcard $(INC_DIR)/%.h)
+	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@) ; fi
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	@-rm -r obj/ $(KERNEL_NAME) aijak.iso
+	@-rm -r $(BIN_DIR) $(OBJ_DIR)
 
 test:
-	qemu-system-x86_64 -kernel $(KERNEL_NAME)
+	$(QEMUCMD)
+
+debug:
+	objcopy --only-keep-debug $(BINARY) debug.sym
+	$(QEMUCMD) -S -s
+debugger:
+	gdb -s debug.sym -ex "target remote localhost:1234"

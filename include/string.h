@@ -2,8 +2,16 @@
 
 #include "types.h"
 
-uint16 strlen(string ch);
+size_t strlen(const char *ch);
 
-uint8 strEqual(string ch1, string ch2);
+uint8 strcmp(const char *s1, const char *s2);
 
-void strReverse(string s);
+uint8 strncmp(const char *s1, const char *s2, size_t num);
+
+char **strtok(char *str, char *delim, size_t *length);
+
+bool strprefix(const char *prefix, const char *str);
+
+uint8 str_backspace(char *s, char c);
+
+void strReverse(char *s);

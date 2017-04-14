@@ -1,7 +1,8 @@
 #pragma once
 
+#include "string.h"
 #include "types.h"
 
-void memory_copy(char *src, char *dst, int len);
-void memory_set(uint8 *dest, uint8 val, uint32 len);
-void int_to_ascii(int n, char str[]);
+char *uitoa(uint32 n, char *str, uint8 base);
+char *itoa(int n, char *str, int base);
+int32 atoi(const char *str);
